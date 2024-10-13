@@ -109,32 +109,75 @@ def print_reduced_form(polynomial_dict):
 
 def check_term_format(equation):
     # Regular expression to match terms in the form 'a * X^p', allowing optional spaces after + or -
-    term_pattern = re.compile(r'^[+-]?\s*\d+(\.\d+)?\s*\* X\^\d+$')
+    equation = equation.replace(' ', '')
+
+    lhs, rhs = equation.split('=')
+
+    lterm_pattern = re.findall(r"([+-]?\d*\.?\d+|\d*\.?\d*)(\*X\^)(\d+)", lhs)
+    rterm_pattern = re.findall(r"([+-]?\d*\.?\d+|\d*\.?\d*)(\*X\^)(\d+)", rhs)
+    print("lterm_pattern =======>>> ", lterm_pattern)
+    print("rterm_pattern =======>>> ", rterm_pattern)
+    
     
     # Split the equation into left-hand side (lhs) and right-hand side (rhs)
-    lhs, rhs = equation.split('=')
     
     # Split both sides into terms based on `+` or `-` starting a new term
     lhs_terms = re.split(r'(?=[+-])', lhs.strip())
     rhs_terms = re.split(r'(?=[+-])', rhs.strip())
 
-    # Check LHS terms if they match the expected format "a * X^p"
-    for term in lhs_terms:
-        term = term.strip()  # Strip any leading/trailing spaces
-        if not term_pattern.match(term):
-            return False
+    print("lhs_terms => : ", lhs_terms)
+    print("rhs_temrs => : ", rhs_terms)
+    
+    lhs_new = move_terms_to_lhs(lhs_terms, rhs_terms)
+    
+    print("New Left-hand side => : ", lhs_new)
+    
+    exit()    
+    # # Check LHS terms if they match the expected format "a * X^p"
+    # for term in lhs_terms:
+    #     term = term.strip()  # Strip any leading/trailing spaces
+    #     if not term_pattern.match(term):
+    #         return False
 
-    # Check RHS terms if they match the expected format "a * X^p"
-    for term in rhs_terms:
-        term = term.strip()  # Strip any leading/trailing spaces
-        if not term_pattern.match(term):
-            return False
+    # # Check RHS terms if they match the expected format "a * X^p"
+    # for term in rhs_terms:
+    #     term = term.strip()  # Strip any leading/trailing spaces
+    #     if not term_pattern.match(term):
+    #         return False
 
     return True
 
+def move_terms_to_lhs(lhs_terms, rhs_terms):
+    """
+    Move the terms from RHS to LHS and change their signs before moving.
+    """
+    # Process each term in the RHS
+    for term in rhs_terms:
+        # Ignore the term if it's just '0' or if it contains '0*X'
+        if term.strip() == '0' or '0*X' in term:
+            continue
+        
+        # If the term starts with '+', change it to '-' and vice versa
+        if term[0] == '+':
+            term = '-' + term[1:]
+        elif term[0] == '-':
+            term = '+' + term[1:]
+        else:
+            term = '-' + term  # If it doesn't have a sign, it means it's positive, so we add '-'
+
+        # Append the modified RHS term to LHS
+        lhs_terms.append(term)
+
+    # Remove any '0' terms from LHS
+    lhs_terms = [term for term in lhs_terms if '0*X' not in term]
+
+    # Join the updated LHS terms into a single string
+    lhs_new = ''.join(lhs_terms)
+    return lhs_new
+
 # Example Usage
-# equation = "1 * X^2 - 2 * X^1 - 24 * X^0 = 0"
-equation = "5 * X^2 + 2 * X^1 - 5 * X^0 = 3 * X^2 + 4 * X^1 + 7 * X^0"
+# equation = "5 * X^2 + 2 * X^1 - 5 * X^0 = 3 * X^2 + 4 * X^1 + 7 * X^0"
+equation = "1 * X^2 - 2 * X^1 - 24 * X^0 = 0"
 
 
 validFormat = check_term_format(equation)
