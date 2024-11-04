@@ -1,15 +1,15 @@
 import re
+import sys
+
 
 def main():
     # Request input from the user
-    equation = input("Enter your polynomial equation: ")
+    if len(sys.argv) != 2:
+        print("Invalid input: Please enter a valid polynomial equation")
+        return
 
     # Validate and parse the input equation
-    validFormat = check_term_format(equation)
-
-    if validFormat is None:
-        print("Invalid input: Please enter a valid polynomial equation ---> : ", validFormat)
-        return
+    validFormat = check_term_format(sys.argv[1])
 
     # Print the reduced form of the polynomial
     print_reduced_form(validFormat)
@@ -36,6 +36,7 @@ def main():
             print("All real numbers are solutions.")
         else:
             print("No solution.")
+
 
 def solve_polynomial(terms):
     # Ensure we have terms for X^2, X^1, and X^0 (constant)
@@ -69,6 +70,7 @@ def solve_polynomial(terms):
             print("Discriminant is strictly positive, the two solutions are:")
             print(format_number(solution1))
             print(format_number(solution2))
+
     elif b != 0:
         solution = -c / b
         print(format_number(solution))
@@ -77,13 +79,14 @@ def solve_polynomial(terms):
     else:
         print("No solution.")
 
+
 def print_reduced_form(polynomial_dict):
     if not polynomial_dict:
         print("Reduced form: 0 = 0")
         return
 
     terms = []
-    for degree in sorted(polynomial_dict.keys(), reverse=True):
+    for degree in sorted(polynomial_dict.keys()):
         coeff = polynomial_dict[degree]
         sign = '+' if coeff > 0 else '-'
         coeff_str = format_coefficient(my_abs(coeff))
@@ -95,6 +98,7 @@ def print_reduced_form(polynomial_dict):
         result = result[1:].strip()  # Remove leading '+'
 
     print("Reduced form:", result + " = 0")
+
 
 def check_term_format(equation):
     # Remove spaces from the equation
@@ -112,10 +116,10 @@ def check_term_format(equation):
 
     # Move all terms from RHS to LHS and flip their signs
     lhs_new = move_terms_to_lhs(lterm_pattern, rterm_pattern)
-    print("checking lhs_new ===> : ", lhs_new)
     if lhs_new is None:
         return None  # Return None if the format is invalid
     return lhs_new
+
 
 def move_terms_to_lhs(lterm_pattern, rterm_pattern):
     lhs_dict = {}
@@ -141,6 +145,7 @@ def move_terms_to_lhs(lterm_pattern, rterm_pattern):
 
     return lhs_dict
 
+
 def parse_coefficient(coeff_str):
     """
     Parses the coefficient string into a float, handling optional signs.
@@ -158,6 +163,7 @@ def parse_coefficient(coeff_str):
             else:
                 return None  # Invalid coefficient
 
+
 def add_term_to_dict(terms_dict, coeff, degree):
     """
     Helper function to add a term to the dictionary of terms.
@@ -171,11 +177,13 @@ def add_term_to_dict(terms_dict, coeff, degree):
     else:
         terms_dict[degree] = coeff
 
+
 def my_abs(number):
     """
     Computes the absolute value of a number without using the built-in abs().
     """
     return -number if number < 0 else number
+
 
 def format_coefficient(coef):
     """
@@ -187,6 +195,7 @@ def format_coefficient(coef):
     else:
         return str(coef)
 
+
 def format_number(num):
     """
     Formats a number by converting it to an integer if it is equivalent
@@ -197,6 +206,7 @@ def format_number(num):
         return str(int(num))
     else:
         return "{0:.6f}".format(num).rstrip('0').rstrip('.')
+
 
 # Run the main function when the script is executed
 if __name__ == "__main__":
