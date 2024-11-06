@@ -141,7 +141,7 @@ def move_terms_to_lhs(lterm_pattern, rterm_pattern):
         add_term_to_dict(lhs_dict, coeff, degree)
 
     # Remove terms with zero coefficients
-    lhs_dict = {deg: coeff for deg, coeff in lhs_dict.items() if coeff != 0}
+    lhs_dict = {deg: coeff for deg, coeff in lhs_dict.items()}
 
     return lhs_dict
 
